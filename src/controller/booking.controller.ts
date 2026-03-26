@@ -6,7 +6,7 @@ import { Event } from '../model/event.model';
 // User: book an event
 const bookEvent = async (req: AuthRequest, res: Response) => {
   try {
-    const { eventId } = req.params;
+    const eventId = req.params.eventId as string;
     const userEmail = req.user?.email;
 
     // Check event exists
