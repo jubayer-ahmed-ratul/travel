@@ -23,7 +23,7 @@ const register = async (req: Request, res: Response) => {
     
     // Generate token
     const token = jwt.sign(
-      { email: savedUser.email, role: savedUser.role },
+      { id: savedUser._id, email: savedUser.email, role: savedUser.role },
       config.jwt_secret as Secret,
       { expiresIn: config.jwt_expires_in as any }
     );
@@ -72,7 +72,7 @@ const login = async (req: Request, res: Response) => {
 
     // Generate token
     const token = jwt.sign(
-      { email: user.email, role: user.role },
+      { id: user._id, email: user.email, role: user.role },
       config.jwt_secret as Secret,
       { expiresIn: config.jwt_expires_in as any }
     );
@@ -120,3 +120,49 @@ export const userControllers = {
   login,
   getUsers,
 };
+
+// Get user by id
+const getUserById = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, data: user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Failed to fetch user', error: err.message });
+  }
+};
+
+// Update user
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, message: 'User updated', data: user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Failed to update user', error: err.message });
+  }
+};
+
+// Delete user
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, message: 'User deleted' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Failed to delete user', error: err.message });
+  }
+};
+
+// Update user role
+const updateRole = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, { role: req.body.role }, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, message: 'Role updated', data: user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Failed to update role', error: err.message });
+  }
+};
+
+Object.assign(userControllers, { getUserById, updateUser, deleteUser, updateRole });

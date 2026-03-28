@@ -1,10 +1,12 @@
 import express from 'express';
 import { bookingControllers } from '../controller/booking.controller';
-import { authenticate, authorize } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/:eventId', authenticate, authorize('user', 'staff'), bookingControllers.bookEvent);
-router.get('/my', authenticate, bookingControllers.getMyBookings);
+router.post('/', authenticate, bookingControllers.createBooking);
+router.get('/', authenticate, bookingControllers.getBookings);
+router.patch('/:id', authenticate, bookingControllers.updateBooking);
+router.delete('/:id', authenticate, bookingControllers.deleteBooking);
 
 export const BookingRoutes = router;

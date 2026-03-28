@@ -1,4 +1,9 @@
+import { Types } from 'mongoose';
+
 export interface IBooking {
-  event: string;
-  user: string;
+  userId: Types.ObjectId;
+  itemId: Types.ObjectId;
+  quantity: number;
+  price: number;
+  status: 'pending' | 'confirmed' | 'cancelled';
 }
